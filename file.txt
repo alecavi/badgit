@@ -1,0 +1,109 @@
+When a file is CREATED, it is added to the repository by the developer.
+When a file in the repo is EDITED, a record is created containing info such as WHO did it, WHEN, and WHAT CHANGES they made
+To EDIT a file, it must first be CHECKED OUT. This operation fails if the file is checked out already, which may happen, for example, if another dev is already
+working on that file. A file stops being checked out when its current user CHECKS it IN.
+
+Questions:
+Should the system be menu-based (run the program and then use stdin to specify commands) or command-based (run the program with command line arguments)?
+-- I personally believe it should be command-based, mostly because that seems to be the way most CLI utilities work (including git).
+
+Architecture:
+	The repository is a simple folder. Internally, it contains a file "edits.log", a subfolder "data", and a subfolder "checked_out". The subfolder contains all of
+	the files in the repo,	while the edits log contains a list of all ways the repo was edited (i.e. "File X was checked out at time T by person P, file X was
+	checked back in at time T+1	and was modified thus: (diff), File Y was added at time T+2 by person P+1"). Finally, the "checked_out" subfolder mirrors the
+	structure of the "data" one, except the files it stores are all empty files. Their presence means that the file with the same name in "data" is checked out.
+	
+	This is a representation of what the repo would look like:
+	
+	repository
+	├───edits.log
+        ├───checked_out
+	│    └───example
+        └───data
+	    └───example.txt
+		
+	one of the simple extensions requires being able to store backups. These would be stored in another folder, and named "example.txt.DDMMYYHHMMSS" (That's a 
+	datetime).
+	
+	repository
+	├───edits.log
+        ├───checked_out
+	│    └───example
+        ├───data
+	│    └───example.txt
+	└───backups
+	    └───example.txt.20201532235959
+		
+	One of the advanced extensions requires being able to roll back to a previous version. Now, this probably implicitly means _any_ old version, meaning we'd want
+	to store a whole lot more backups. We want to have a separate "versions" folder. To save some space, we may want to store the entire original version, then only
+	the difference from the previous version (but the space savings wouldn't be that massive, so it may not be worth the effort)
+	
+	repository
+	├───edits.log
+        ├───checked_out
+	│    └───example
+        ├───data
+	│    └───example.txt
+	├───backups
+	│    └───example.txt.20201532235959
+	└───versions
+	    ├───example.txt.org
+	    ├───example.txt.1
+	    └───example.txt.2
+	
+	
+This satisfies the basic requirements as follows: 
+	1: There is a menu/command based front end.
+	2: Creating a repository is a matter of creating a repo folder with an empty "edits.log" file and an empty "data" folder.
+	3: Adding files to the repository can be done by moving them into the "data" folder and updating the edits log.
+	4: Checking a file out requires reading "checked_out" to see if it's available, marking it as unavailable, and if so copying it to some destination outside the 
+		repo. Checking it back in requires taking a diff of the old and new versions, storing it in the log, replacing the old file with the new, and deleting the 
+		marker in "checked_out".
+	5: Creating a log file just happens naturally as the system evolves.
+	
+
+Simple extensions:
+	1: That's a bit of a vague requirement. It's probably asking for menus with submenus or commands with subcommands. I think the opportunity to add this should
+		come naturally as we work on the project.
+	2: Accessing multiple repositories by name means storing them in some central location (as opposed to the git approach of storing a repo right next to the project 
+		it's for). After that, it can be done by having repository folders be named and running the system on the one with the specified name.
+	3: Creating a text editor would be a nightmarishly complex task. That being said, there are ways to just fire the user's default text editor and use that.
+	4: Input validation would be achieved as usual, by checking whether the inputs make sense and printing an error if they don't.
+	5: This requirement is also a bit vague. Automatically listing the contents _when_? Anyway, it should be a matter of running ls.
+	6: Adding comments can be done by having that be a feature of the "add" or "check-in" commands/menu entries. The comments can be stored in the log file.
+	7: Making backup copies... in a sense, a file is not modified until it's checked back in already. We could easily add a "backup" folder that stores a copy of
+		the old file. We may want to store diffs, to take up less space.
+		
+Advanced extensions:
+	1: "Secure access" is by far the most difficult requirement. I would put it dead last in the order in which we do things. It would probably involve chmod and 
+		sudo, though.
+	2: Rolling back means either having an old version of the file, or having a diff between an older and the current versions of the file. Assuming we make
+		backup copies/take diffs every time the file is modified, we should easily be able to recover/reconstruct the original when needed. After this, we should
+		replace the active version (the one in the "data" folder) with the recovered/reconstructed version. Actual version control systems are able to rollback to 
+		_any_ previous version, so we may need to keep multiple backups.
+	3: Archiving the whole project into a tar or zip just means archiving the repository folder. Accessing an existing archive just means unpacking it and
+		accessing the resulting folder.
+	4: Integrating other tools is an _overwhelmingly vague_ requirement. I'd say the best way to do that is to have some sort of "exec" menu option/subcommand which
+		just runs an arbitrary user-provided command within the "data" folder.
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
