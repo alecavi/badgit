@@ -11,6 +11,7 @@ do
 		checkout) shift; exec ./repo-checkout.sh $@ ;;
 		checkin) shift; exec ./repo-checkin.sh $@ ;;
 		edit) shift; exec ./repo-edit.sh $@ ;;
+		ls) shift; exec ./repo-ls.sh $@ ;;
 		--)shift; break ;;
 		*) echo "invalid subcommand \"$1\""; break ;;
 	esac
