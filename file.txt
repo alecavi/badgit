@@ -85,25 +85,3 @@ Advanced extensions:
 		accessing the resulting folder.
 	4: Integrating other tools is an _overwhelmingly vague_ requirement. I'd say the best way to do that is to have some sort of "exec" menu option/subcommand which
 		just runs an arbitrary user-provided command within the "data" folder.
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	

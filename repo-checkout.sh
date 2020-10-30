@@ -1,39 +1,60 @@
 #!/bin/bash
 
-if [ ! -d "$PWD"/repository ]; then
+repo="$PWD"/repository
+
+if [ ! -d "$repo" ]; then
 	1>&2 echo "repo: repository folder not found"
 	exit 1
 fi
 
 file=$1
-if [ -z file ]; then
-	1>&2 echo "repo: Invalid file"
+checked_out="$PWD"/repository/checked_out
+
+# Permission checks:
+# repository:x, checked_out:wx, data:x, PWD:wx,  data/$file:r. event.log:w
+
+if [ ! -x "$repo" ]; then
+	1>&2 echo "repo: Cannot access repository contents"
 	exit 1
 fi
 
-checked_out="$PWD"/repository/checked_out/"$file"
-
-if [ -e "$checked_out" ]; then
-	echo "repo: Cannot check out \"$file\": it is already checked out"
+if [ ! -w "$checked_out" ] || [ ! -x "$checked_out" ]; then
+	1>&2 echo "repo: Cannot check out \"$file\" as permission to access information about which files are checked out is missing"
 	exit 1
 fi
 
-touch "$checked_out"
-if [ $? -ne 0 ]; then
-	1>&2 echo "repo: Couldn't set \"$file\" as checked out. File won't be checked out."
+if [ ! -x "$repo"/data ]; then
+	1>&2 echo "repo: Cannot check out \"$file\" as permission to access repository data is missing"
 	exit 1
 fi
 
-cp "$checked_out" "$PWD"/"$file"
-if [ $? -ne 0 ]; then
-	1>&2 echo "repo: Couldn't check out \"$file\""
-	rm "$checked_out"
-	if [$? -ne 0 ]; then
-		1>&2 echo "Couldn't cleanup checkout info. \"$file\" will still be considered checked out"
-	fi
+if [ ! -r "$repo"/data/"$file" ]; then
+	1>&2 echo "repo: Cannot check out \"$file\" as permission to copy the file is missing"
 	exit 1
 fi
 
-echo "$(date): file \"$file\" has been checked out" >> events.log
+if [ ! -w "$PWD" ] || [ ! -x "$PWD" ]; then
+	1>&2 echo "repo: Cannot check out \"$file\" as the necessary permissions are not available in the output folder"
+	exit 1
+fi
 
-exit 0
+if [ ! -w "$repo"/events.log ]; then
+	1>&2 echo "repo: Cannot check out \"$file\" as permission to write to the event log is missing"
+	exit 1
+fi
+
+# Sanity checks:
+
+if [ -e "$PWD"/"$file" ]; then
+	1>&2 echo "repo: cannot checkout \"$file\" as a file with the same name already exists"
+	exit 1
+fi
+
+if [ -e "$checked_out"/"$file" ]; then
+	1>&2 echo "repo: Cannot check out \"$file\" as it is already checked out"
+	exit 1
+fi
+
+touch "$checked_out"/"$file"
+cp "$repo"/data/"$file" "$PWD"/"$file"
+echo "$(date): file \"$file\" has been checked out" >> "$repo"/events.log
