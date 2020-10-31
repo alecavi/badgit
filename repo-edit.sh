@@ -12,7 +12,7 @@ file_in_repo="$repo"/data/"$file"
 checked_out="$repo"/checked_out/
 
 # Permission checks:
-# repository: x, data: wx, checked_out: x, $file_in_repo: rw, events.log: w
+# repository: x, data: wx, checked_out: wx, $file_in_repo: rw, events.log: w
 
 if [ ! -x "$repo" ]; then
 	1>&2 echo "repo: Cannot access repository folder as the necessary permissions are not available"
@@ -24,7 +24,7 @@ if [ ! -w "$repo"/data ] || [ ! -x "$repo"/data ]; then
 	exit 1
 fi
 
-if [ ! -x "$checked_out" ]; then
+if [ ! -w "$checked_out" ] || [ ! -x "$checked_out" ]; then
 	1>&2 echo "repo: Cannot access checkout information as the necessary permissions are not available"
 	exit 1
 fi
@@ -44,10 +44,38 @@ if [ ! -w "$repo"/events.log ]; then
 	exit 1
 fi
 
-if [ -e "$checked_out"/file ]; then
-	1>&2 echo "repo: cannot open \"$file\" as it's checked out"
+if [ -e "$checked_out"/"$file" ]; then
+	1>&2 echo "repo: Cannot edit \"$file\" as it is checked out"
 	exit 1
 fi
 
+touch "$checked_out"/"$file"
 "${EDITOR:-vi}" "$file_in_repo"
 echo "$(date): Edited \"$file\"" >> "$repo"/events.log
+
+echo "$(date)" >> timepassed.dbg
+
+
+log_err() {
+	1>&2 echo "\"$file\" has been edited, but it will still be considered checked out"
+
+	if [ -w "$repo"/events.log ]; then
+		echo "$(date): Could not check \"$file\" back in after editing it" >> "$repo"/events.log
+	else
+		1>&2 echo "Events log was not updated as it could not be accessed"
+	fi
+}
+
+if [ ! -x "$repo" ]; then
+	1>&2 echo "repo: Cannot access repository folder as the necessary permissions are no longer  available"
+	log_err
+	exit 1
+fi
+
+if [ ! -w "$checked_out" ] || [ ! -x "$checked_out" ]; then
+	1>&2 echo "repo: Cannot access checkout information as the necessary permissions are no longer available"
+	log_err
+	exit 1
+fi
+
+rm "$checked_out"/"$file"
