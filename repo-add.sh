@@ -3,7 +3,7 @@
 file="$1"
 
 if [ ! -e "$file" ]; then
-	1>&2 echo "repo: Invalid file \"$file\""
+	1>&2 echo "repo: \"$file\" does not exist"
 	exit 1
 fi
 
