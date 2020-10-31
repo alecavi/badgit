@@ -12,14 +12,14 @@ file_in_repo="$repo"/data/"$file"
 checked_out="$repo"/checked_out/
 
 # Permission checks:
-# repository: x, data: wx, checked_out: wx, $file_in_repo: rw, events.log: w
+# repository: x, data: x, checked_out: wx, $file_in_repo: rw, events.log: w
 
 if [ ! -x "$repo" ]; then
 	1>&2 echo "repo: Cannot access repository folder as the necessary permissions are not available"
 	exit 1
 fi
 
-if [ ! -w "$repo"/data ] || [ ! -x "$repo"/data ]; then
+if [ ! -x "$repo"/data ]; then
 	1>&2 echo "repo: Cannot access repository data as the necessary permissions are not available"
 	exit 1
 fi
