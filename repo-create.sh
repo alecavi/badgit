@@ -21,8 +21,10 @@ if [ ! -w "$path" ] || [ ! -x "$path" ]; then
 	exit 1
 fi
 
-mkdir "$path"/repository
-mkdir "$path"/repository/data
-mkdir "$path"/repository/checked_out
-touch "$path"/repository/events.log
+repo="$path"/repository
 
+mkdir "$repo"
+mkdir "$repo"/data
+mkdir "$repo"/checked_out
+mkdir "$repo"/backup
+touch "$repo"/events.log

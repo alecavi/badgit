@@ -1,13 +1,16 @@
 #!/bin/bash
 
 file="$1"
+repo="$2"
 
 if [ ! -e "$file" ]; then
 	1>&2 echo "repo: \"$file\" does not exist"
 	exit 1
 fi
 
-repo="$PWD"/repository
+if [ -z "$repo" ]; then
+	repo="$PWD"/repository
+fi
 
 # Permission checks:
 # repository:x, data:wx, PWD:wx, events.log:w, PWD/$file (only if $file is a folder):w

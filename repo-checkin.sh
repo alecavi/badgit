@@ -2,12 +2,16 @@
 
 
 file="$1"
+repo="$2"
+
 if [ -z "$file" ]; then
 	1>&2 echo "repo: invalid file"
 	exit 1
 fi
 
-repo="$PWD"/repository
+if [ -z "$repo" ]; then
+	repo="$PWD"/repository
+fi
 
 if [ ! -d "$repo" ]; then
 	1>$2 echo "repo: repository directory not found"
@@ -36,8 +40,6 @@ if [ ! -w "$repo"/events.log ]; then
 	1>&2 echo "repo: Cannot write to event log"
 	exit 1
 fi
-
-# Sanity checks:
 
 if [ ! -e "$repo"/checked_out/"$file" ]; then
 	1>&2 echo "repo: Cannot check in \"$file\" as it was never checked out"

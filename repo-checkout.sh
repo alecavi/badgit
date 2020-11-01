@@ -1,17 +1,21 @@
 #!/bin/bash
 
-repo="$PWD"/repository
+file="$1"
+repo="$2"
+
+if [ -z "$repo" ]; then
+	repo="$PWD"/repository
+fi
+
+checked_out="$repo"/checked_out
+
+# Permission checks:
+# repository:x, checked_out:wx, data:x, PWD:wx,  data/$file:r. event.log:w
 
 if [ ! -d "$repo" ]; then
 	1>&2 echo "repo: repository folder not found"
 	exit 1
 fi
-
-file=$1
-checked_out="$PWD"/repository/checked_out
-
-# Permission checks:
-# repository:x, checked_out:wx, data:x, PWD:wx,  data/$file:r. event.log:w
 
 if [ ! -x "$repo" ]; then
 	1>&2 echo "repo: Cannot access repository contents"

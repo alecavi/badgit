@@ -1,8 +1,5 @@
 #!/bin/bash
 
-#getopts -n (program name) -o (short options) --long (long options, comma-separated)
-#a : means that option takes a value
-
 while :
 do
 	case "$1" in

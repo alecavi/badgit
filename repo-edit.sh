@@ -1,7 +1,11 @@
 #!/bin/bash
 
 file="$1"
-repo="$PWD"/repository
+repo="$2"
+
+if [ -z "$repo" ]; then
+	repo="$PWD"/repository
+fi
 
 if [ ! -d "$repo" ]; then
 	1>&2 echo "repo: repository folder not found"
@@ -52,8 +56,6 @@ fi
 touch "$checked_out"/"$file"
 "${EDITOR:-vi}" "$file_in_repo"
 echo "$(date): Edited \"$file\"" >> "$repo"/events.log
-
-echo "$(date)" >> timepassed.dbg
 
 
 log_err() {
