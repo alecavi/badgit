@@ -2,8 +2,7 @@
 
 path=$1;
 if [ -z "$path" ]; then
-	1>&2 echo "repo: Invalid path \"$path\""
-	exit 1
+	path="$PWD"
 fi
 
 if [ ! -d "$path" ]; then
