@@ -9,6 +9,7 @@ do
 		checkin) shift; exec ./repo-checkin.sh $@ ;;
 		edit) shift; exec ./repo-edit.sh $@ ;;
 		ls) shift; exec ./repo-ls.sh $@ ;;
+		backup) shift; exec ./repo-backup.sh $@ ;;
 		--)shift; break ;;
 		*) echo "invalid subcommand \"$1\""; break ;;
 	esac
