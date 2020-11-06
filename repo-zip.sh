@@ -22,4 +22,10 @@ if [ ! -w "$repo"/events.log ]; then
 fi
 
 echo $(date)": repo was archived" >> "$repo"/events.log
-zip -r repository.zip "$repo"
+if [ "$repo" == "$PWD/repository" ]; then
+	pushd "$PWD/"
+	zip -r repository.zip "repository"
+	popd
+else
+	zip -r repository.zip "$repo"
+fi
