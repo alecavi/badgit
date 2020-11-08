@@ -38,6 +38,11 @@ if [ ! -e "$file_in_repo" ]; then
 	exit 1
 fi
 
+if [ ! -f "$file_in_repo" ]; then
+	1>&2 echo "repo: Cannot edit \"$file\" as it's not a file"
+	exit 1
+fi
+
 if [ ! -r "$file_in_repo" ] || [ ! -w "$file_in_repo" ]; then
 	1>&2 echo "repo: Cannot edit \"$file\" as the necessary permissions are not available"
 	exit 1
@@ -55,7 +60,7 @@ fi
 
 touch "$checked_out"/"$file"
 "${EDITOR:-vi}" "$file_in_repo"
-echo "$(date): Edited \"$file\"" >> "$repo"/events.log
+echo "$(date): $USER edited \"$file\"" >> "$repo"/events.log
 
 
 log_err() {

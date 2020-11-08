@@ -30,8 +30,8 @@ create () {
 
 	backup_file="$repo"/backup/"$file"."$(date +%Y-%m-%dT%H:%M:%S)"
 
-	\cp -R "$repo"/data/"$file" "$backup_file"
-	echo "$(date): created backup of \"$file\" called \"$backup_file\"" >> "$repo"/events.log
+	cp -R "$repo"/data/"$file" "$backup_file"
+	echo "$(date): $USER created backup of \"$file\" called \"$backup_file\"" >> "$repo"/events.log
 }
 
 restore () {	
@@ -60,8 +60,8 @@ restore () {
 		exit 1
 	fi
 
-	\cp -fR "$repo"/backup/"$latest_backup" "$repo"/data/"$file"
-	echo "$(date): restored \"$file\" from latest backup" >> "$repo"/events.log
+	cp -fR "$repo"/backup/"$latest_backup" "$repo"/data/"$file"
+	echo "$(date): $USER restored \"$file\" from latest backup" >> "$repo"/events.log
 }
 
 delete () {
@@ -80,6 +80,7 @@ delete () {
 		exit 1
 	fi
 
+	echo "$(date): $USER deleted latest backup of \"$file\"" >> "$repo"/events.log
 	rm -r "$repo"/backup/"$latest_backup"
 }
 

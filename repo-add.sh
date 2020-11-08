@@ -8,30 +8,38 @@ if [ ! -e "$file" ]; then
 	exit 1
 fi
 
+filepath=$(realpath "$file")
+filedir=$(dirname "$filepath")
+
 if [ -z "$repo" ]; then
 	repo="$PWD"/repository
 fi
-
-# Permission checks:
-# repository:x, data:wx, PWD:wx, events.log:w, PWD/$file (only if $file is a folder):w
 
 if [ ! -d "$repo" ]; then
 	1>&2 echo "repo: Missing repository in $PWD/repository"
 	exit 1
 fi
 
-if [ ! -w "$repo" ] || [ ! -x "$repo" ]; then # Moving a file requires write and execute permissions on the "from" and "to" folders
+# Permission checks:
+# repository:x, data:wx, $filedir:wx, events.log:w, $filepath (only if $filepath is a folder):w
+
+if [ ! -x "$repo" ]; then
 	1>&2 echo "repo: Missing permissions to move into repository"
 	exit 1
 fi
 
-if [ ! -w "$PWD" ] || [ ! -x "$PWD" ]; then
-	1>&2 echo "repo: Missing permissions to move from folder"
+if [ ! -x "$repo"/data ] || [ ! -w "$repo"/data ]; then
+	1>&2 echo "repo: MIssing permissions to update repository data"
 	exit 1
 fi
 
-if [ -d "$PWD"/"$file" ]; then
-	if [ ! -w "$PWD"/"$file" ]; then # Moving a folder requires write permissions, to modify the .. link inside it.
+if [ ! -w "$filedir" ] || [ ! -x "$filedir" ]; then
+	1>&2 echo "repo: Missing permissions to move from \"$filedir\""
+	exit 1
+fi
+
+if [ -d "$filepath" ]; then
+	if [ ! -w "$filepath" ]; then # Moving a folder requires write permissions, to modify the .. link inside it.
 		echo "repo: Missing permissions to move selected folder"
 		exit 1
 	fi
@@ -42,5 +50,5 @@ if [ ! -w "$repo"/events.log ]; then
 	exit 1
 fi
 
-mv "$file" "$repo"/data/"$file"
-echo "$(date): Added \"$file\"" >> "$repo"/events.log
+mv "$filepath" "$repo"/data/"$file"
+echo "$(date): $USER added \"$file\"" >> "$repo"/events.log

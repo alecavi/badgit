@@ -9,13 +9,13 @@ fi
 
 checked_out="$repo"/checked_out
 
-# Permission checks:
-# repository:x, checked_out:wx, data:x, PWD:wx,  data/$file:r. event.log:w
-
 if [ ! -d "$repo" ]; then
 	1>&2 echo "repo: repository folder not found"
 	exit 1
 fi
+
+# Permission checks:
+# repository:x, checked_out:wx, data:x, PWD:wx,  data/$file:r. event.log:w
 
 if [ ! -x "$repo" ]; then
 	1>&2 echo "repo: Cannot access repository contents"
@@ -29,6 +29,11 @@ fi
 
 if [ ! -x "$repo"/data ]; then
 	1>&2 echo "repo: Cannot check out \"$file\" as permission to access repository data is missing"
+	exit 1
+fi
+
+if [ ! -e "$repo"/data/"$file" ]; then
+	1>&2 echo "repo: Cannot check out \"$file\" as it doesn't exist"
 	exit 1
 fi
 
@@ -60,5 +65,5 @@ if [ -e "$checked_out"/"$file" ]; then
 fi
 
 touch "$checked_out"/"$file"
-cp "$repo"/data/"$file" "$PWD"/"$file"
-echo "$(date): file \"$file\" has been checked out" >> "$repo"/events.log
+cp -a "$repo"/data/"$file" "$PWD"/"$file"
+echo "$(date): $USER checked out \"$file\"" >> "$repo"/events.log

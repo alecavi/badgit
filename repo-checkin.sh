@@ -1,11 +1,10 @@
 #!/bin/bash
 
-
 file="$1"
 repo="$2"
 
-if [ -z "$file" ]; then
-	1>&2 echo "repo: invalid file"
+if [ ! -e "$file" ]; then
+	1>&2 echo "repo: cannot checkin \"$file\" as it doesn't exist"
 	exit 1
 fi
 
@@ -14,7 +13,7 @@ if [ -z "$repo" ]; then
 fi
 
 if [ ! -d "$repo" ]; then
-	1>$2 echo "repo: repository directory not found"
+	1>&2 echo "repo: repository directory not found"
 	exit 1
 fi
 
@@ -46,6 +45,8 @@ if [ ! -e "$repo"/checked_out/"$file" ]; then
 	exit 1
 fi
 
-mv -f "$PWD"/"$file" "$repo"/data/"$file"
+
+rm -r "$repo"/data/"$file"
+mv "$PWD"/"$file" "$repo"/data/"$file"
 rm "$repo"/checked_out/"$file"
-echo $(date)": checked in \"$file\"" >> "$repo"/events.log
+echo $(date)": $USER checked in \"$file\"" >> "$repo"/events.log
