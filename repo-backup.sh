@@ -1,10 +1,9 @@
 #!/bin/bash
 
 commentLogs () {
-	read -p "Enter name of user that made the change: " user
 	read -p "Enter a comment for the logs: " comment
 	if [[ ! -z $comment ]]; then
-		echo "Comment from \"user\": \"$comment\"" >> "$repo"/events.log
+		echo "$(date): Comment from \"$USER\": \"$comment\"" >> "$repo"/events.log
 	fi
 }
 

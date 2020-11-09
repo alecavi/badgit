@@ -12,6 +12,6 @@ case "$1" in
 	backup)   shift; exec "$path"/repo-backup.sh $@ ;;
 	zip) 	  shift; exec "$path"/repo-zip.sh $@ ;;
 	unzip)    shift; exec "$path"/repo-unzip.sh $@ ;;
-	--)	  shift; break ;;
-	*) 	  echo "invalid subcommand \"$1\""; break ;;
+	--)	  shift ;;
+	*) 	  echo "invalid subcommand \"$1\""; exit 1 ;;
 esac
