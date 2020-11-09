@@ -1,5 +1,13 @@
 #!/bin/bash
 
+commentLogs () {
+	read -p "Enter name of user that made the change: " user
+	read -p "Enter a comment for the logs: " comment
+	if [[ ! -z $comment ]]; then
+		echo "Comment from \"user\": \"$comment\"" >> "$repo"/events.log
+	fi
+}
+
 repo="$1"
 
 if [ -z "$repo" ]; then
@@ -21,6 +29,7 @@ if [ ! -w "$repo"/events.log ]; then
 	exit 1
 fi
 
+commentLogs
 echo $(date)": repo was archived" >> "$repo"/events.log
 if [ "$repo" == "$PWD/repository" ]; then
 	pushd "$PWD/"

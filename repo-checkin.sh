@@ -1,5 +1,13 @@
 #!/bin/bash
 
+commentLogs () {
+	read -p "Enter name of user that made the change: " user
+	read -p "Enter a comment for the logs: " comment
+	if [[ ! -z $comment ]]; then
+		echo "Comment from \"user\": \"$comment\"" >> "$repo"/events.log
+	fi
+}
+
 file="$1"
 repo="$2"
 
@@ -49,4 +57,5 @@ fi
 rm -r "$repo"/data/"$file"
 mv "$PWD"/"$file" "$repo"/data/"$file"
 rm "$repo"/checked_out/"$file"
+commentLogs
 echo $(date)": $USER checked in \"$file\"" >> "$repo"/events.log
